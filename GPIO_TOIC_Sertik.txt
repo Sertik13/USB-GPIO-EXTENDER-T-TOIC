@@ -1,0 +1,153 @@
+
+#define FW_STR "1.0 for Mikrotik by Sertik"
+#define ZZ "\r\n\OK\r\n"
+  
+/*
+IO1 - PA4 - OUTPUT
+IO2 - PA2 - OUTPUT
+IO3 - PA0 - OUTPUT
+IO4 - PA6 - OUTPUT
+IO5 - PA7 - OUTPUT
+IO6 - PA3 - INPUT
+IO7 - PA1 - INPUT
+IO8 - PA8 - INPUT
+IO9 - PB1 - INPUT
+IOx - PA5 - INPUT
+LED - PF0
+ */
+
+var _msg() {
+      var c = stoi(&MSG.RX, 'c');
+      memcpy(SYS.RAM, &MSG.RX, MSG.SIZE);
+      switch (c) {
+          case 'S1':
+              PA4.VALUE = 1;
+              PF0.VALUE = 1;
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA4.VALUE);
+              delay 100;
+              PF0.VALUE = 0;
+              break;
+          case 'R1':
+              PA4.VALUE = 0;
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA4.VALUE);
+              break;
+          case 'S2':
+              PA2.VALUE = 1;
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA2.VALUE);
+              break;
+          case 'R2':
+              PA2.VALUE = 0;
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA2.VALUE);
+              break;
+          case 'S3':
+              PA0.VALUE = 1;
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA0.VALUE);
+              break;
+          case 'R3':
+              PA0.VALUE = 0;
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA0.VALUE);
+              break;
+          case 'S4':
+              PA6.VALUE = 1;
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA6.VALUE);
+              break;
+          case 'R4':
+              PA6.VALUE = 0;
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA6.VALUE);
+              break;
+          case 'S5':
+              PA7.VALUE = 1;
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA7.VALUE);
+              break;
+          case 'R5':
+              PA7.VALUE = 0;
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA7.VALUE);
+              break;
+          case 'G1':
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA4.VALUE);
+              break;
+          case 'G2':
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA2.VALUE);
+              break;
+          case 'G3':
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA0.VALUE);
+              break;
+          case 'G4':
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA6.VALUE);
+              break;
+          case 'G5':
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA7.VALUE);
+              break;
+          case 'G6':
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA3.VALUE);
+              break;
+          case 'G7':
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA1.VALUE);
+              break;
+          case 'G8':
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA8.VALUE);
+              break;
+          case 'G9':
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PB1.VALUE);
+              break;
+          case 'G10':
+              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA5.VALUE);
+              break;
+          case 'AT':
+              sprintf(&UART0.TX, "\OK\r\n\", "");
+              break;  
+          case 'ATI':
+              sprintf(&UART0.TX, "%s\r\n\OK\r\n\", FW_STR);
+              break;       
+          default:
+              break;
+      }
+}
+
+
+var io_setup() {
+
+    // for output GPIO_INIT_LOW - 0 on outpin on startup
+    // for output GPIO_INIT_HIGT - 1 on outpin on startup
+ 
+    // IO1 - PA4 - OUTPUT
+    PA4.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    // IO2 - PA2 - OUTPUT
+    PA2.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    // IO3 - PA0 - OUTPUT
+    PA0.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    // IO4 - PA6 - OUTPUT
+    PA6.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    // IO5 - PA7 - OUTPUT
+    PA7.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    // IO6 - PA3 - INPUT
+    PA3.MODE = GPIO_MODE_INPUT | GPIO_PULL_DOWN;
+    // IO7 - PA1 - INPUT
+    PA1.MODE = GPIO_MODE_INPUT | GPIO_PULL_DOWN;
+    // IO8 - PA8 - INPUT
+    PA8.MODE = GPIO_MODE_INPUT | GPIO_PULL_DOWN;
+    // IO9 - PB1 - INPUT
+    PB1.MODE = GPIO_MODE_INPUT | GPIO_PULL_DOWN;
+    // IOx - PA5 - INPUT
+    PA5.MODE = GPIO_MODE_INPUT | GPIO_PULL_DOWN;
+
+    // LED - PF0
+    PF0.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    
+    SPI.SETUP = SPI_SETUP_POLARITY_LOW|SPI_SETUP_EDGE_LEADING|1000/*kBod*/;
+    SPI.EN = 1;
+    
+    PA1.PWM = 128; 
+    TIM2.FREQ = TIM3.FREQ = 2;                                
+    TIM2.EN = TIM3.EN = 1;
+    UART0.CFG = UART_MODE_PLAIN | UART_CONFIG_START;
+    __enable_irq();
+}
+
+
+var main() {
+
+    io_setup();
+    while (1) {};
+    return 0;
+}
