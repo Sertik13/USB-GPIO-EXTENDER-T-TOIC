@@ -1,18 +1,16 @@
-
-#define FW_STR "1.0 for Mikrotik by Sertik"
-#define ZZ "\r\nOK\r\n"
+#define FW_STR "2.1 02 Aug 2021\r\nmodify for Mikrotik ppp-out at-chat\r\n by Sertik 08 Okt 2024"
   
 /*
-IO1 - PA4 - OUTPUT
+IO1 - PA4 - ADC
 IO2 - PA2 - OUTPUT
-IO3 - PA0 - OUTPUT
-IO4 - PA6 - OUTPUT
-IO5 - PA7 - OUTPUT
+IO3 - PA0 - SPI CS
+IO4 - PA6 - SPI MISO
+IO5 - PA7 - SPI MOSI
 IO6 - PA3 - INPUT
-IO7 - PA1 - INPUT
-IO8 - PA8 - INPUT
-IO9 - PB1 - INPUT
-IOx - PA5 - INPUT
+IO7 - PA1 - PWM OUTPUT
+IO8 - NC
+IO9 - PB1 - PWM INPUT
+IOx - PA5 - SPI SCK
 LED - PF0
  */
 
@@ -20,84 +18,37 @@ var _msg() {
       var c = stoi(&MSG.RX, 'c');
       memcpy(SYS.RAM, &MSG.RX, MSG.SIZE);
       switch (c) {
-          case 'S1':
-              PA4.VALUE = 1;
+          case 'S':
+              PA2.VALUE = 1;
+              sprintf(&UART0.TX, "%d\r\nOK\r\n", PA2.VALUE);
+              break;
+          case 'R':
+              PA2.VALUE = 0;
+              sprintf(&UART0.TX, "%d\r\nOK\r\n", PA2.VALUE);
+              break;
+          case 'A':
+              sprintf(&UART0.TX, "%d\r\nOK\r\n", PA4.VALUE);
+              break;
+         case 'K':
+              PA0.VALUE = 0;
+              memcpy(&SPI.DR, SYS.RAM+1, MSG.SIZE-1);
+              sprintf(&UART0.TX, "%d\r\nOK\r\n", SYS.RAM+1);
+              PA0.VALUE = 1;
+              break;
+          case 'G':
+              sprintf(&UART0.TX, "%d\r\nOK\r\n", PA3.VALUE);
+              break;
+          case 'F':
+              sprintf(&UART0.TX, "%d\r\nOK\r\n", PB1.VALUE);
+              break;
+          case 'L':
               PF0.VALUE = 1;
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA4.VALUE);
-              delay 100;
+              sprintf(&UART0.TX, "OK\r\n");
+              delay (1000)
               PF0.VALUE = 0;
               break;
-          case 'R1':
-              PA4.VALUE = 0;
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA4.VALUE);
-              break;
-          case 'S2':
-              PA2.VALUE = 1;
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA2.VALUE);
-              break;
-          case 'R2':
-              PA2.VALUE = 0;
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA2.VALUE);
-              break;
-          case 'S3':
-              PA0.VALUE = 1;
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA0.VALUE);
-              break;
-          case 'R3':
-              PA0.VALUE = 0;
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA0.VALUE);
-              break;
-          case 'S4':
-              PA6.VALUE = 1;
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA6.VALUE);
-              break;
-          case 'R4':
-              PA6.VALUE = 0;
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA6.VALUE);
-              break;
-          case 'S5':
-              PA7.VALUE = 1;
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA7.VALUE);
-              break;
-          case 'R5':
-              PA7.VALUE = 0;
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA7.VALUE);
-              break;
-          case 'G1':
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA4.VALUE);
-              break;
-          case 'G2':
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA2.VALUE);
-              break;
-          case 'G3':
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA0.VALUE);
-              break;
-          case 'G4':
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA6.VALUE);
-              break;
-          case 'G5':
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA7.VALUE);
-              break;
-          case 'G6':
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA3.VALUE);
-              break;
-          case 'G7':
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA1.VALUE);
-              break;
-          case 'G8':
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA8.VALUE);
-              break;
-          case 'G9':
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PB1.VALUE);
-              break;
-          case 'G10':
-              sprintf(&UART0.TX, "%d\r\n\OK\r\n", PA5.VALUE);
-              break;
-          case 'AT':
-              sprintf(&UART0.TX, "\OK\r\n\", "");
-              break;  
-          case 'ATI':
-              sprintf(&UART0.TX, "%s\r\n\OK\r\n\", FW_STR);
+          case 'I':
+              sprintf(&UART0.TX, "I%s\r\nOK\r\n", FW_STR);
               break;       
           default:
               break;
@@ -106,34 +57,24 @@ var _msg() {
 
 
 var io_setup() {
-
-    // for output GPIO_INIT_LOW - 0 on outpin on startup
-    // for output GPIO_INIT_HIGT - 1 on outpin on startup
- 
-    // IO1 - PA4 - OUTPUT
-    PA4.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    // IO1 - PA4 - ADC
+    PA4.MODE = GPIO_MODE_ADC; 
     // IO2 - PA2 - OUTPUT
     PA2.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
-    // IO3 - PA0 - OUTPUT
-    PA0.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
-    // IO4 - PA6 - OUTPUT
-    PA6.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
-    // IO5 - PA7 - OUTPUT
-    PA7.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
     // IO6 - PA3 - INPUT
     PA3.MODE = GPIO_MODE_INPUT | GPIO_PULL_DOWN;
-    // IO7 - PA1 - INPUT
-    PA1.MODE = GPIO_MODE_INPUT | GPIO_PULL_DOWN;
-    // IO8 - PA8 - INPUT
-    PA8.MODE = GPIO_MODE_INPUT | GPIO_PULL_DOWN;
-    // IO9 - PB1 - INPUT
-    PB1.MODE = GPIO_MODE_INPUT | GPIO_PULL_DOWN;
-    // IOx - PA5 - INPUT
-    PA5.MODE = GPIO_MODE_INPUT | GPIO_PULL_DOWN;
-
+    // IO7 - PA1 - PWM OUTPUT
+    PA1.MODE = GPIO_MODE_OPWM|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    // IO9 - PB1 - PWM INPUT
+    PB1.MODE = GPIO_MEASURE_FREQ|GPIO_MODE_IPWM|GPIO_INIT_LOW; 
     // LED - PF0
     PF0.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
     
+    // IO3 - PA0 - SPI CS
+    // IO4 - PA6 - SPI MISO
+    // IO5 - PA7 - SPI MOSI
+    // IOx - PA5 - SPI SCK
+    PA0.MODE = GPIO_INIT_LOW|GPIO_OTYPE_PP|GPIO_TYPE_SOFTWARE|GPIO_MODE_OUTPUT; 
     SPI.SETUP = SPI_SETUP_POLARITY_LOW|SPI_SETUP_EDGE_LEADING|1000/*kBod*/;
     SPI.EN = 1;
     
