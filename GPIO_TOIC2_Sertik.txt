@@ -1,0 +1,129 @@
+#define FW_STR "1.1 for Mikrotik modify Sertik"
+  
+/*
+IO1 - PA4 - OUTPUT
+IO2 - PA2 - OUTPUT
+IO3 - PA0 - OUTPUT
+IO4 - PA7 - OUTPUT
+IO5 - PA6 - OUTPUT
+
+IO6 - PA3 - INPUT
+IO7 - PA1 - INPUT
+IO8 - PA13 - INPUT
+IO9 - PB1 - INPUT
+IO10 - BOOT
+
+IOx - PA5 - INPUT PULLED DONW R10K
+LED - PF0
+
+ */
+ 
+var GPIO_OUT = [PA4.VALUE, PA2.VALUE, PA0.VALUE, PA7.VALUE, PA6.VALUE];
+var GPIO_IN = [PA3.VALUE, PA1.VALUE, PA13.VALUE, PB1.VALUE, PB1.VALUE];
+
+var io_setup() {
+    // OUTPUTS
+    PA4.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    PA2.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    PA0.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    PA7.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    PA6.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    // INPUTS
+    PA3.MODE = GPIO_MODE_INPUT | GPIO_PULL_UP;
+    PA1.MODE = GPIO_MODE_INPUT | GPIO_PULL_UP;
+    PA13.MODE = GPIO_MODE_INPUT | GPIO_PULL_UP;
+    PB1.MODE = GPIO_MODE_INPUT | GPIO_PULL_UP;
+    PA5.MODE = GPIO_MODE_INPUT | GPIO_PULL_DOWN; // unused
+    // LED - PF0
+    PF0.MODE = GPIO_MODE_OUTPUT|GPIO_INIT_LOW|GPIO_OTYPE_PP;
+    // UART
+    UART0.CFG = UART_MODE_PLAIN | UART_CONFIG_START;
+    __enable_irq();
+}
+
+var _msg() {
+    if(MSG.PORT == 4) {
+        memcpy(&RING.BUF, &MSG.RX, MSG.SIZE);
+    }
+}
+
+var main() {
+    var c;
+    var pstate;
+    var p_index;
+    var p;
+    io_setup();
+    if((RING.ALLOC = 16) != 16) {
+        return 1;
+    }
+    SYS.WDG = 1;
+    while(1){
+        if(RING.QUEUE > 0) {
+            c = RING.PULL;
+            if (c == '~') {
+                pstate = 1;
+                p_index = 0;
+            } else if (pstate == 1) {
+                pstate = 0;
+                switch (c) {
+                    case 'I':
+                        sprintf(&UART0.TX, "%s\r\nOK\r\n", FW_STR);
+                        pstate = 0;
+                        break;
+		case 'L':
+                        PF0.VALUE = 1;
+                        sprintf(&UART0.TX, "OK\r\n");
+                        delay (1000);
+                        PF0.VALUE = 0;
+              break;
+                    case 'B':
+		    sprintf(&UART0.TX, "module reseting\r\nOK\r\n");
+                        delay (1000);
+                        SYS.RESET = 1;
+                        break;
+                    case 'A':
+                        sprintf(&UART0.TX, "%d%d%d%d%d\r\nOK\r\n", *GPIO_IN[0], *GPIO_IN[1], *GPIO_IN[2], *GPIO_IN[3], *GPIO_IN[4]);
+                        pstate = 0;
+                        break;
+                    case 'S':
+                    case 'R':
+                    case 'G':
+                    case 'P':
+                        pstate = c;
+                        break;
+                    default:
+                        break;
+                }
+            } else if (pstate) {
+                p = c - '0';
+                if (pstate == 'S' || pstate == 'R') { // ~S or ~R
+                    if (p > 0 && p < 6) {
+                        GPIO_OUT[p - 1] = (pstate == 'S');
+                        sprintf(&UART0.TX, "%c%d\r\nOK\r\n", pstate, p);
+                    } else {
+                        sprintf(&UART0.TX, "Err\r\n");
+                    }
+                    pstate = 0;
+                } else if (pstate == 'G') { // ~G
+                    if (p > 0 && p < 6) {
+                        sprintf(&UART0.TX, "%d\r\nOK\r\n", *GPIO_IN[p - 1]);
+                    } else {
+                        sprintf(&UART0.TX, "Err\r\n");
+                    }
+                    pstate = 0;
+                } else if (pstate == 'P') { // ~P
+                    GPIO_OUT[p_index++] = (c == '1');
+                    if (p_index == 5) {
+                        sprintf(&UART0.TX, "%d%d%d%d%d\r\nOK\r\n", *GPIO_OUT[0], *GPIO_OUT[1], *GPIO_OUT[2], *GPIO_OUT[3], *GPIO_OUT[4]);
+                        pstate = 0;
+                    }
+                }
+            }
+        } else {
+            delay(10);
+        }
+        SYS.WDG = 42;
+    }
+
+    return 0;
+}
