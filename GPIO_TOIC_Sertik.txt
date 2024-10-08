@@ -1,4 +1,4 @@
-#define FW_STR "2.1 02 Aug 2021\r\nmodify for Mikrotik ppp-out at-chat\r\n by Sertik 08 Okt 2024"
+#define FW_STR "1.0 for Mikrotik by Sertik"
   
 /*
 IO1 - PA4 - ADC
@@ -43,8 +43,8 @@ var _msg() {
               break;
           case 'L':
               PF0.VALUE = 1;
-              sprintf(&UART0.TX, "OK\r\n");
-              delay (1000)
+              sprintf(&UART0.TX, "OK\r\n", PF0.VALUE);
+              delay (1000);
               PF0.VALUE = 0;
               break;
           case 'I':
@@ -54,7 +54,6 @@ var _msg() {
               break;
       }
 }
-
 
 var io_setup() {
     // IO1 - PA4 - ADC
