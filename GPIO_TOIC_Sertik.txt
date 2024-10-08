@@ -1,6 +1,6 @@
 
 #define FW_STR "1.0 for Mikrotik by Sertik"
-#define ZZ "\r\n\OK\r\n"
+#define ZZ "\r\nOK\r\n"
   
 /*
 IO1 - PA4 - OUTPUT
