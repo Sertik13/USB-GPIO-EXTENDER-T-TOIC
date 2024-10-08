@@ -48,7 +48,7 @@ var _msg() {
               PF0.VALUE = 0;
               break;
           case 'I':
-              sprintf(&UART0.TX, "I%s\r\nOK\r\n", FW_STR);
+              sprintf(&UART0.TX, "%s\r\nOK\r\n", FW_STR);
               break;       
           default:
               break;
