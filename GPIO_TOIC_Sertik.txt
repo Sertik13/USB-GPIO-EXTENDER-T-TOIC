@@ -1,4 +1,4 @@
-#define FW_STR "1.0 for Mikrotik by Sertik"
+#define FW_STR "1.0 for Mikrotik modify Sertik"
   
 /*
 IO1 - PA4 - ADC
