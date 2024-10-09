@@ -30,7 +30,9 @@
 
 
 :global  fOpenDevExtTOIC do={
- 
+
+local version "1.0 08/10/2024"
+
 :local ModuleType "USB GPIO EXTENDER TOIC"
 :local portTypeUSB "usb"
 :global OpenDevModuleType $ModuleType
@@ -68,10 +70,14 @@
 :put "$0 help" 
 :put "$0 list"
 :put "$0 logic [true/false]"
-:put "$0 reset"
-:put "$0 SetOut XXYXY [0-1]"
-:put "$0 OutOn X [1-5]"
-:put "$0 OutOff Y [1-5]"
+:put "$0 OutOn"
+:put "$0 OutOff"
+:put "$0 In"
+:put "$0 ADC"
+:put "$0 PWM"
+:put "$0 SPI xxYYY"
+:put "$0 ATI"
+:put "$0 AT"
 :terminal style none
   :return []}
 
