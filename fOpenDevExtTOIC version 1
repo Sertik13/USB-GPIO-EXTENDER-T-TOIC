@@ -6,16 +6,16 @@
 
 # usage: 
 
-# $OpenDevExtTOIC list - output a list of function commands for the module to the terminal and log
-# :put [$OpenDevExtTOIC logic] - return the set value of the operating logic
-# $OpenDevExtTOIC logic [true/false] - set forward/reverse operating logic
-# $OpenDevExtTOIC OutOn
-# $OpenDevExtTOIC OutOff
-# $OpenDevExtTOIC In
-# $OpenDevExtTOIC SPI xxxxx
-# $OpenDevExtTOIC PWM
-# $OpenDevExtTOIC AT
-# $OpenDevExtTOIC ATI
+# $fOpenDevExtTOIC list - output a list of function commands for the module to the terminal and log
+# :put [$fOpenDevExtTOIC logic] - return the set value of the operating logic
+# $fOpenDevExtTOIC logic [true/false] - set forward/reverse operating logic
+# $fOpenDevExtTOIC OutOn
+# $fOpenDevExtTOIC OutOff
+# $fOpenDevExtTOIC In
+# $fOpenDevExtTOIC SPI xxxxx
+# $fOpenDevExtTOIC PWM
+# $fOpenDevExtTOIC AT
+# $fOpenDevExtTOIC ATI
 
 # module commands:
 # -----------------------------------------------------------------------
