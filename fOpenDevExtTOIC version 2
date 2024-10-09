@@ -74,9 +74,9 @@
 :put "$0 reset"
 :put "$0 SetOut XXYXY [0-1]"
 :put "$0 OutOn X [1-5]"
+:put "$0 OutOff Y [1-5]"
 :put "$0 ReadIn"
 :put "$0 In [6-9]"
-:put "$0 OutOff Y [1-5]"
 :put "$0 AT"
 :put "$0 ATI"
 :terminal style none
