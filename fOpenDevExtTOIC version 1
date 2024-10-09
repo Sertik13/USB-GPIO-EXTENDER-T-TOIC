@@ -9,13 +9,13 @@
 # $fOpenDevExtTOIC list - output a list of function commands for the module to the terminal and log
 # :put [$fOpenDevExtTOIC logic] - return the set value of the operating logic
 # $fOpenDevExtTOIC logic [true/false] - set forward/reverse operating logic
-# $fOpenDevExtTOIC OutOn
-# $fOpenDevExtTOIC OutOff
-# $fOpenDevExtTOIC In
-# $fOpenDevExtTOIC SPI xxxxx
-# $fOpenDevExtTOIC PWM
-# $fOpenDevExtTOIC AT
-# $fOpenDevExtTOIC ATI
+# $fOpenDevExtTOIC OutOn - turn on OUT (2)
+# $fOpenDevExtTOIC OutOff - turn off OUT (2)
+# $fOpenDevExtTOIC In - read IN (6)
+# $fOpenDevExtTOIC SPI xxxxx - send xxxxx to SPI and return module`s answer
+# $fOpenDevExtTOIC PWM - read PWM-OUT
+# $fOpenDevExtTOIC AT - check connect and LED
+# $fOpenDevExtTOIC ATI - request information about the firmware version
 
 # module commands:
 # -----------------------------------------------------------------------
