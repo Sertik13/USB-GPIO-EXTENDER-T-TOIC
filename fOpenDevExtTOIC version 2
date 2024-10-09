@@ -6,17 +6,17 @@
 
 # usage: 
 
-# $OpenDevExt list - output a list of function commands for the module to the terminal and log
+# $fOpenDevExt list - output a list of function commands for the module to the terminal and log
 # :put [$OpenDevExt logic] - return the set value of the operating logic
-# $OpenDevExt logic [true/false] - set forward/reverse operating logic
-# $OpenDevExt reset - module reset
-# $OpenDevExt SetOut XXYXY [0-1] - setting all Out outputs, for example 00111
-# $OpenDevExt OutOn X [1-5] - “turn on” output X 
-# $OpenDevExt In X [1-5] - read IN X
-# $OpenDevExt ReadIn XXYXY - read all In input
-# $OpenDevExt OutOff Y - “turn off” output Y [1-5]
-# $OpenDevExt AT - test connect
-# $OpenDevExt ATI - firmware information
+# $fOpenDevExt logic [true/false] - set forward/reverse operating logic
+# $fOpenDevExt reset - module reset
+# $fOpenDevExt SetOut XXYXY [0-1] - setting all Out outputs, for example 00111
+# $fOpenDevExt OutOn X [1-5] - “turn on” output X 
+# $fOpenDevExt In X [1-5] - read IN X
+# $fOpenDevExt ReadIn XXYXY - read all In input
+# $fOpenDevExt OutOff Y - “turn off” output Y [1-5]
+# $fOpenDevExt AT - test connect
+# $fOpenDevExt ATI - firmware information
 
 # module commands:
 # -----------------------------------------------------------------------
